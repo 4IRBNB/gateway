@@ -24,8 +24,8 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       default-filters:
-        - PreserveHostHeader=true
-        - AddRequestHeader=Authorization, {Authorization}
+      #        - PreserveHostHeader=true
+      #        - AddRequestHeader=Authorization, {Authorization}
       discovery:
         locator:
           enabled: true
@@ -85,4 +85,8 @@ management:
   endpoint:
     gateway:
       access: unrestricted
+#logging:
+#  level:
+#    org.springframework.cloud.gateway: DEBUG
+#    reactor.netty.http.client: DEBUG
 

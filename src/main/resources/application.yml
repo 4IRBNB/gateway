@@ -1,13 +1,77 @@
+#spring:
+#  application:
+#    name: gateway
+#  profiles:
+#    active: dev
+#  config:
+#    import: "configserver:http://localhost:18080"  # 차후 사용예정
+
 spring:
+  webflux:
+    static-path-pattern: /swagger-ui/**
+  main:
+    web-application-type: reactive
   application:
     name: gateway
   profiles:
     active: dev
-  config:
-    import: "configserver:http://localhost:18080"  # Config Server ?? ??
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      default-filters:
+        - PreserveHostHeader=true
+        - AddRequestHeader=Authorization, {Authorization}
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: lodge
+          uri: lb://lodge
+          predicates:
+            - Path=/api/lodges/**,/internal/lodges/**,/api-docs-lodge
 
+        - id: chat
+          uri: lb://reservation
+          predicates:
+            - Path=/api/reservations/**,/internal/reservations/**,/api-docs-reservation
+
+        - id: coupon
+          uri: lb://coupon
+          predicates:
+            - Path=/api/coupons/**,/internal/coupons/**,/api-docs-coupon
+
+        - id: notification
+          uri: lb://notification
+          predicates:
+            - Path=/api/notifications/**,/internal/notifications/**,/api-docs-notification
+
+        - id: payment
+          uri: lb://payment
+          predicates:
+            - Path=/api/payments/**,/internal/payments/**,/api-docs-payment
+
+        - id: review
+          uri: lb://review
+          predicates:
+            - Path=/api/reviews/**,/internal/reviews/**,/api-docs-review
+
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/api/users/**,/internal/users/**,/api-docs-user
+
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/api/auth/**,/api-docs-auth
 server:
-  port: 0
+  port: 19091
+#  port: 0
 eureka:
   client:
     service-url:
@@ -17,4 +81,8 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+

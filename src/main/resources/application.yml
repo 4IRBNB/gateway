@@ -35,7 +35,7 @@ spring:
           predicates:
             - Path=/api/lodges/**,/internal/lodges/**,/api-docs-lodge
 
-        - id: chat
+        - id: reservation
           uri: lb://reservation
           predicates:
             - Path=/api/reservations/**,/internal/reservations/**,/api-docs-reservation

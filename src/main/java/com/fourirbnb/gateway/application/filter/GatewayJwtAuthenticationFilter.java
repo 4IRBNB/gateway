@@ -46,16 +46,21 @@ public class GatewayJwtAuthenticationFilter implements GlobalFilter, Ordered {
     if (isWhitelisted(path)) {
       return chain.filter(exchange);
     }
-    String token = extractToken(exchange);
-    Claims claims = extractClaims(token);
-    log.info("claims: {}", claims);
+
     //token 만료 or 변조
-    if (token == null || claims == null) {
-      //401
+    String token = extractToken(exchange);
+    if (token == null) {
       return unauthorizedResponse(exchange);
     }
+    log.info("token: {}", token);
+    Claims claims = extractClaims(token);
+    if (claims == null) {
+      return unauthorizedResponse(exchange);
+    }
+    log.info("claims: {}", claims);
+
     //token 변조
-    String userId = claims.get("userId", String.class);
+    String userId = claims.get("id", String.class);
     String role = claims.get("role", String.class);
     log.info("userId: {}, role: {}", userId, role);
     if (userId == null || role == null) {
@@ -83,13 +88,16 @@ public class GatewayJwtAuthenticationFilter implements GlobalFilter, Ordered {
   }
 
   private Claims extractClaims(String token) {
+    if (token == null) {
+      return null;
+    }
     // BASE64 디코딩 후 HMAC 변환
     try {
       SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
       Claims claims = Jwts.parser()
           .verifyWith(key)
           .build()
-          .parseEncryptedClaims(token)
+          .parseSignedClaims(token)
           .getPayload();
 
       //만료시간 확인

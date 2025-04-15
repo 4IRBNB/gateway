@@ -7,6 +7,8 @@
 #    import: "configserver:http://localhost:18080"  # 차후 사용예정
 
 spring:
+  config:
+    import: optional:file:.env.properties
   webflux:
     static-path-pattern: /swagger-ui/**
   main:
@@ -90,3 +92,10 @@ management:
 #    org.springframework.cloud.gateway: DEBUG
 #    reactor.netty.http.client: DEBUG
 
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+  whitelist:
+    paths:
+      - "/api/auth/signIn"
+      - "/api/auth/signUp"
